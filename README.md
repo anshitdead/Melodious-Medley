@@ -3,7 +3,7 @@ Anshit Vishwakarma
 17119005
 Production and Industrial Engineering
 II Year
-CodeLink-https://github.com/anshitdead/Melodious-Medley/blob/master/Melodious_Medley_FinalModel.py
+CodeLink-https://github.com/shit-happens/Melodious-Medley/blob/master/Melodious_Medley_FinalModel.py
 
 Introduction-
 This document gives the detailed method and algorithm applied by me in Melodious Medley,in which we have to suggest a new song to a person based on his/her preferences and music taste by making a predictive model.

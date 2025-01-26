@@ -73,7 +73,3 @@ Final predictions were determined with a threshold of 0.5.
 ## Remarks  
 
 Both LightGBM and ANN performed similarly on the test set. By combining their strengths through ensembling, the final model achieved robust performance, making it well-suited for recommending songs tailored to user preferences.
-
---- 
-
-Let me know if you need further refinements!

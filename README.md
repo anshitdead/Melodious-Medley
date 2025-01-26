@@ -1,17 +1,79 @@
-Code Link: https://github.com/shit-happens/Melodious-Medley/blob/master/Melodious_Medley_FinalModel.py
+# Melodious Medley: Song Recommendation Model
 
-Introduction: This documentation gives the precise method and algorithm applied in Melodious Medley. We have to suggest a new song to a person based on his/her preferences and music taste by making a predictive model.
-Feature extraction from Datasets: The Dataset consists of 15 features in which I have used 14 features(excluding ID as it does not have a major impact on prediction). The Data does not have any missing data, making the work a little easier. Missing data in the pandas dataframe can be checked using the dataset.IsNull().sum().sum(), which gives you the total number of missing data in your raw data. The most difficult and important feature to deal with is ts_listen. The Time-Series Data can be used in the pandas dataframe using dataset['ts_listen']=pd.to_datetime(dataset.ts_listen)
-This line converts the raw data into a systematic date-time format that can be further used to extract different values. E.g., Date, Hour, seconds, milliseconds, day of the week, Year, etc. I have used the weekday feature using
-dataset2['Weekday']=dataset2.ts_listen.dt.weekday 
-This will create a new column, namely 'Weekday,' which will contain the day of the week in which the particular song was listened to. It gives the value of 1 to 6 (Monday=0,Tuesday=1,....,Sunday=6). I have used this feature because a person will prefer to listen to more songs on the weekend than on a working day. To use the Weekday feature in my model training, I converted it into dummy variables using the pandas command dataset = pd.get_dummies(dataset, columns=['Weekday'], drop_first=True) 
-which creates the dummy variables with one less variable to avoid the dummy variable trap.
-The dataset has normalized using StandardScalar, which converts x’=(x-mean)/s.d .An important point to note is that I have used the same mean and standard deviation for training, valid, and test datasets.
-Algorithms used in training: I have tried many predictive algorithms such as RandomForest, XGBoost, LightGBM, and ANN. Out of all the algorithms I tried, LightGBM and ANN were the best, with 0.87% Accuracy(Parameter tuning applied). Now let us go deeper into both the Algorithms. 
->LightGBM
-Light GBM is a fast, distributed, high-performance gradient boosting framework based on a decision tree algorithm, used for ranking, classification, and many other machine learning tasks. Since it is based on decision tree algorithms, it splits the tree leaf-wise with the best fit, whereas other boosting algorithms split the tree depth-wise or level-wise rather than leaf-wise. So when growing on the same leaf in Light GBM, the leaf-wise algorithm can reduce more loss than the level-wise algorithm and hence results in much better accuracy, which any of the existing boosting algorithms can rarely achieve. Also, it is surprisingly speedy, hence the word 'Light.' I have trained the model 100 rounds with Grid search parameter tuning applied. At last, it was concluded that the model performs best in its default parameters only. 
->ANN
-An ANN can easily be applied for predictive training by making the number of nodes in the last layer equal 1, using sigmoid activation in that neutron and Binary Cross-Entropy Loss. I have trained a deeper model in this problem with five layers and 30 neurons in each layer. I have also used DROPOUT regularization with p=0.2, which prevents the model from overfitting the training data and learning more robust features. I have trained the model with batch size =16 and epochs=10. RELU activations are applied in every layer as they outperform other activations.
-Model Evaluation I have divided the training data into 80-20 split(80% training and 20% validation Data). The validation data is used to evaluate the model and for parameter tuning.For evaluation I tried both accuracy_score & roc_auc_score.
-Remarks: Both the models were performing almost similarly on the test set. I decided to use model ensembling of both the models. I calculated the final probabilities by both the algorithms and took the mean. 
-ypred=(y_pred1+y_pred2)/2 and finally converted ypred>0.5 to 1 and ypred<0.5 to 0.
+**Introduction**  
+Melodious Medley is a predictive model designed to recommend songs based on user preferences and listening habits. This documentation outlines the methodology and algorithms used to build the model.
+
+---
+
+## Feature Extraction from the Dataset  
+
+The dataset comprises 15 features, of which 14 were used for prediction (excluding `ID` as it doesn't significantly impact the outcome). The dataset is complete with no missing values, verified using:  
+```python
+dataset.isnull().sum().sum()
+```  
+
+A key feature in the dataset is the `ts_listen` field, which captures time-series data of song listening events. This field was transformed into a standardized datetime format to extract valuable temporal features such as:  
+
+- **Day of the Week**:  
+  Using the following code, a new column `Weekday` was created:  
+  ```python
+  dataset['Weekday'] = pd.to_datetime(dataset['ts_listen']).dt.weekday
+  ```  
+  Values range from `0` (Monday) to `6` (Sunday). This feature is particularly useful as song-listening behavior varies between weekdays and weekends.
+
+- **Dummy Variables**:  
+  To use `Weekday` in model training, it was converted into dummy variables, avoiding the dummy variable trap:  
+  ```python
+  dataset = pd.get_dummies(dataset, columns=['Weekday'], drop_first=True)
+  ```
+
+- **Normalization**:  
+  Features were normalized using StandardScaler:  
+  \[
+  x' = \frac{x - \text{mean}}{\text{std. deviation}}
+  \]
+  The same scaling parameters were applied consistently across training, validation, and test datasets.
+
+---
+
+## Algorithms and Training  
+
+Various algorithms were evaluated, including **Random Forest**, **XGBoost**, **LightGBM**, and **ANN**. The best results (accuracy ~0.87%) were achieved with **LightGBM** and **ANN** after parameter tuning.  
+
+### **LightGBM**  
+LightGBM is a gradient-boosting framework based on decision trees. Unlike traditional algorithms that split trees depth-wise, LightGBM employs a leaf-wise approach, optimizing for better accuracy and speed. Key highlights:  
+- Model trained for 100 rounds.  
+- Grid search for parameter tuning confirmed default parameters yielded optimal performance.  
+
+### **Artificial Neural Network (ANN)**  
+An ANN was implemented with the following architecture:  
+- **Layers**: 5 layers with 30 neurons each.  
+- **Activation**: ReLU for hidden layers, Sigmoid for the output layer.  
+- **Loss Function**: Binary Cross-Entropy.  
+- **Regularization**: Dropout (p=0.2) to prevent overfitting.  
+- **Training**: Batch size = 16, Epochs = 10.  
+
+---
+
+## Model Evaluation  
+
+The dataset was split into 80% training and 20% validation subsets. Evaluation metrics included:  
+- **Accuracy Score**  
+- **ROC AUC Score**  
+
+### **Model Ensembling**  
+To improve predictions, outputs from both models were ensembled by averaging probabilities:  
+```python
+ypred = (y_pred1 + y_pred2) / 2
+```
+Final predictions were determined with a threshold of 0.5.
+
+---
+
+## Remarks  
+
+Both LightGBM and ANN performed similarly on the test set. By combining their strengths through ensembling, the final model achieved robust performance, making it well-suited for recommending songs tailored to user preferences.
+
+--- 
+
+Let me know if you need further refinements!
